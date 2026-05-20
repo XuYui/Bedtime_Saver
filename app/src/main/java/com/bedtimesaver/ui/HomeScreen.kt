@@ -961,8 +961,8 @@ private fun BottomTabs(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(82.dp)
-                .padding(horizontal = 48.dp, vertical = 10.dp),
+                .height(92.dp)
+                .padding(horizontal = 42.dp, vertical = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -993,25 +993,34 @@ private fun BottomTabItem(
         onClick = onClick,
         color = if (selected) BedtimeTokens.navActive else Color.Transparent,
         shape = RoundedCornerShape(24.dp),
-        modifier = Modifier.width(112.dp),
+        modifier = Modifier
+            .width(112.dp)
+            .height(72.dp),
     ) {
         Column(
             modifier = Modifier
-                .height(62.dp)
-                .padding(vertical = 5.dp),
+                .fillMaxSize()
+                .padding(vertical = 6.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
+            verticalArrangement = Arrangement.spacedBy(3.dp, Alignment.CenterVertically),
         ) {
-            Text(
-                text = icon,
-                color = if (selected) BedtimeTokens.green else BedtimeTokens.muted,
-                fontSize = 28.sp,
-                lineHeight = 28.sp,
-            )
+            Box(
+                modifier = Modifier.height(32.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = icon,
+                    color = if (selected) BedtimeTokens.green else BedtimeTokens.muted,
+                    fontSize = 24.sp,
+                    lineHeight = 24.sp,
+                    textAlign = TextAlign.Center,
+                )
+            }
             Text(
                 text = label,
                 color = if (selected) BedtimeTokens.green else BedtimeTokens.muted,
                 style = MaterialTheme.typography.labelMedium,
+                maxLines = 1,
             )
         }
     }

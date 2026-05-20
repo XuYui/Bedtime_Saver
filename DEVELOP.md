@@ -66,7 +66,7 @@ app/src/main/java/com/bedtimesaver/
 
 ```text
 design/stitch_bedtime_saver_sleep_assistant/ # Stitch 设计稿和截图
-release/BedtimeSaver-v1.0.0.apk              # 当前发行展示包
+release/BedtimeSaver-v1.0.1.apk              # 当前发行展示包
 release/README.md                            # 当前发行包 SHA-256
 CHANGELOG.md                                 # 每次修改必须更新
 ```
