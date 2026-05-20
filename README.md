@@ -31,6 +31,12 @@
 - AlarmManager
 - SharedPreferences for lightweight runtime settings
 
+## 开发协作
+
+- AI 开发接手指南：[DEVELOP.md](DEVELOP.md)
+- 更新日志：[CHANGELOG.md](CHANGELOG.md)
+- 每次修正或升级都必须同步 GitHub，并更新版本说明。
+
 ## 核心架构
 
 ```mermaid
