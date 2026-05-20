@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SnoozeTrack - Sleep Supervision</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-surface": "#e5e2e1",
+                        "inverse-on-surface": "#313030",
+                        "error-container": "#93000a",
+                        "on-tertiary-container": "#43535b",
+                        "on-secondary": "#0a3817",
+                        "on-background": "#e5e2e1",
+                        "inverse-primary": "#21638d",
+                        "surface-tint": "#93cdfc",
+                        "on-error": "#690005",
+                        "primary-fixed": "#cbe6ff",
+                        "tertiary-fixed": "#d4e5ef",
+                        "surface-variant": "#353534",
+                        "on-tertiary-fixed-variant": "#394951",
+                        "on-surface-variant": "#c1c7cf",
+                        "background": "#131313",
+                        "on-primary": "#00344f",
+                        "on-secondary-container": "#91c193",
+                        "on-tertiary-fixed": "#0d1e25",
+                        "on-secondary-fixed-variant": "#24502c",
+                        "primary": "#c5e3ff",
+                        "secondary-fixed-dim": "#a2d3a4",
+                        "secondary-fixed": "#bdefbe",
+                        "surface-container-low": "#1c1b1b",
+                        "primary-fixed-dim": "#93cdfc",
+                        "on-surface": "#e5e2e1",
+                        "secondary": "#a2d3a4",
+                        "tertiary": "#d1e2ec",
+                        "surface-container-highest": "#353534",
+                        "surface-container": "#201f1f",
+                        "on-primary-fixed": "#001e30",
+                        "on-primary-container": "#08557e",
+                        "error": "#ffb4ab",
+                        "outline-variant": "#41474e",
+                        "on-secondary-fixed": "#002109",
+                        "tertiary-container": "#b5c6d0",
+                        "surface-dim": "#131313",
+                        "surface-container-high": "#2a2a2a",
+                        "secondary-container": "#24502c",
+                        "on-error-container": "#ffdad6",
+                        "primary-container": "#90caf9",
+                        "outline": "#8b9199",
+                        "surface-container-lowest": "#0e0e0e",
+                        "tertiary-fixed-dim": "#b8c9d3",
+                        "on-tertiary": "#23333a",
+                        "surface-bright": "#393939",
+                        "surface": "#131313",
+                        "on-primary-fixed-variant": "#004b71"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "xs": "4px",
+                        "base": "8px",
+                        "lg": "24px",
+                        "xl": "32px",
+                        "gutter": "12px",
+                        "margin": "16px",
+                        "sm": "8px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "title-lg": ["Inter"],
+                        "headline-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "title-lg": ["18px", {"lineHeight": "24px", "fontWeight": "500"}],
+                        "headline-md": ["22px", {"lineHeight": "28px", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bg-mesh {
+            background-color: #131313;
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(210, 100%, 15%, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, hsla(140, 40%, 10%, 0.15) 0px, transparent 50%);
+        }
+        @keyframes pulse-gentle {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(0.98); }
+        }
+        .animate-pulse-gentle {
+            animation: pulse-gentle 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        .glass-card {
+            background: rgba(26, 26, 26, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid #37474f;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md selection:bg-primary-container selection:text-on-primary-container overflow-hidden">
+<!-- Immersive Sleep Blocking Canvas -->
+<main class="relative h-screen w-full flex flex-col items-center justify-between px-margin py-xl bg-mesh">
+<!-- Top Status (Non-interactive) -->
+<div class="w-full flex justify-center pt-xl">
+<div class="flex items-center gap-xs text-on-surface-variant opacity-60">
+<span class="material-symbols-outlined text-[18px]">bedtime</span>
+<span class="font-label-md text-label-md tracking-widest uppercase">Deep Rest Mode</span>
+</div>
+</div>
+<!-- Central Content -->
+<div class="w-full max-w-md flex flex-col items-center text-center space-y-lg px-gutter">
+<div class="relative">
+<!-- Atmospheric Glow Background -->
+<div class="absolute inset-0 bg-primary/10 blur-[80px] rounded-full scale-150 animate-pulse-gentle"></div>
+<!-- Icon and Headline -->
+<div class="relative z-10 space-y-md">
+<span class="material-symbols-outlined text-primary text-[64px] animate-pulse-gentle" style="font-variation-settings: 'FILL' 1;">nightlight</span>
+<h1 class="font-headline-lg text-headline-lg text-on-surface">睡眠监督中</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-[280px] mx-auto leading-relaxed">
+                        深夜是身体修复的最佳时机。检测到你正尝试打开应用，请放下手机，安心入睡。
+                    </p>
+</div>
+</div>
+<!-- Countdown Section -->
+<div class="w-full mt-xl space-y-base" id="challenge-section">
+<div class="flex justify-between items-end px-xs">
+<span class="font-label-md text-label-md text-on-surface-variant">剩余挑战时间</span>
+<span class="font-title-lg text-title-lg text-primary font-mono" id="timer-text">58s</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary transition-all duration-1000 ease-linear" id="progress-bar" style="width: 96.6%;"></div>
+</div>
+</div>
+</div>
+<!-- Action Layer -->
+<div class="w-full max-w-md flex flex-col gap-gutter px-gutter pb-xl z-20">
+<button class="w-full py-md bg-primary text-background font-title-lg rounded-xl active:scale-95 transition-transform duration-200 shadow-lg shadow-primary/10">
+                回到桌面
+            </button>
+<button class="w-full py-md border border-outline-variant text-primary font-body-lg rounded-xl hover:bg-surface-container-high active:scale-95 transition-all duration-200" id="unlock-btn">
+                我要解锁，开始 60 秒挑战
+            </button>
+<p class="text-center font-label-md text-label-md text-on-tertiary-fixed-variant opacity-50 px-lg">
+                完成冷静挑战以获得 5 分钟紧急使用权限
+            </p>
+</div>
+<!-- Ambient Decoration -->
+<div class="absolute top-1/2 -left-20 w-64 h-64 bg-secondary/5 blur-[100px] rounded-full"></div>
+<div class="absolute bottom-1/4 -right-20 w-72 h-72 bg-tertiary/5 blur-[120px] rounded-full"></div>
+</main>
+<!-- Micro-interactions Script -->
+<script>
+        let timeLeft = 58;
+        const totalTime = 60;
+        const timerText = document.getElementById('timer-text');
+        const progressBar = document.getElementById('progress-bar');
+        const unlockBtn = document.getElementById('unlock-btn');
+        const challengeSection = document.getElementById('challenge-section');
+
+        const updateUI = () => {
+            timerText.innerText = `${timeLeft}s`;
+            const percentage = (timeLeft / totalTime) * 100;
+            progressBar.style.width = `${percentage}%`;
+
+            if (timeLeft <= 0) {
+                clearInterval(interval);
+                onChallengeComplete();
+            }
+        };
+
+        const onChallengeComplete = () => {
+            timerText.innerText = "挑战成功";
+            timerText.classList.add('text-secondary');
+            progressBar.classList.replace('bg-primary', 'bg-secondary');
+            
+            // State change for the secondary button
+            unlockBtn.innerText = "临时解锁";
+            unlockBtn.classList.add('bg-secondary-container', 'text-on-secondary-container', 'border-none');
+            
+            // Visual feedback
+            challengeSection.classList.add('animate-pulse');
+            setTimeout(() => challengeSection.classList.remove('animate-pulse'), 1000);
+        };
+
+        const interval = setInterval(() => {
+            if (timeLeft > 0) {
+                timeLeft--;
+                updateUI();
+            }
+        }, 1000);
+
+        // Simple button interaction
+        unlockBtn.addEventListener('click', () => {
+            if (timeLeft <= 0) {
+                alert('已为您提供 5 分钟临时访问权限。祝您好梦。');
+            } else {
+                // Shake effect if clicked during countdown
+                unlockBtn.classList.add('translate-x-1');
+                setTimeout(() => unlockBtn.classList.remove('translate-x-1'), 100);
+            }
+        });
+
+        // Initialize progress width correctly on start
+        updateUI();
+    </script>
+<!-- Material Symbols initialization -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+</body></html>

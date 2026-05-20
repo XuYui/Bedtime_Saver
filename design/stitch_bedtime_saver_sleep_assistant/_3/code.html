@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="zh"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-surface": "#e5e2e1",
+                    "inverse-on-surface": "#313030",
+                    "error-container": "#93000a",
+                    "on-tertiary-container": "#43535b",
+                    "on-secondary": "#0a3817",
+                    "on-background": "#e5e2e1",
+                    "inverse-primary": "#21638d",
+                    "surface-tint": "#93cdfc",
+                    "on-error": "#690005",
+                    "primary-fixed": "#cbe6ff",
+                    "tertiary-fixed": "#d4e5ef",
+                    "surface-variant": "#353534",
+                    "on-tertiary-fixed-variant": "#394951",
+                    "on-surface-variant": "#c1c7cf",
+                    "background": "#131313",
+                    "on-primary": "#00344f",
+                    "on-secondary-container": "#91c193",
+                    "on-tertiary-fixed": "#0d1e25",
+                    "on-secondary-fixed-variant": "#24502c",
+                    "primary": "#c5e3ff",
+                    "secondary-fixed-dim": "#a2d3a4",
+                    "secondary-fixed": "#bdefbe",
+                    "surface-container-low": "#1c1b1b",
+                    "primary-fixed-dim": "#93cdfc",
+                    "on-surface": "#e5e2e1",
+                    "secondary": "#a2d3a4",
+                    "tertiary": "#d1e2ec",
+                    "surface-container-highest": "#353534",
+                    "surface-container": "#201f1f",
+                    "on-primary-fixed": "#001e30",
+                    "on-primary-container": "#08557e",
+                    "error": "#ffb4ab",
+                    "outline-variant": "#41474e",
+                    "on-secondary-fixed": "#002109",
+                    "tertiary-container": "#b5c6d0",
+                    "surface-dim": "#131313",
+                    "surface-container-high": "#2a2a2a",
+                    "secondary-container": "#24502c",
+                    "on-error-container": "#ffdad6",
+                    "primary-container": "#90caf9",
+                    "outline": "#8b9199",
+                    "surface-container-lowest": "#0e0e0e",
+                    "tertiary-fixed-dim": "#b8c9d3",
+                    "on-tertiary": "#23333a",
+                    "surface-bright": "#393939",
+                    "surface": "#131313",
+                    "on-primary-fixed-variant": "#004b71"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "md": "16px",
+                    "xs": "4px",
+                    "base": "8px",
+                    "lg": "24px",
+                    "xl": "32px",
+                    "gutter": "12px",
+                    "margin": "16px",
+                    "sm": "8px"
+            },
+            "fontFamily": {
+                    "body-md": ["Inter"],
+                    "label-md": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "title-lg": ["Inter"],
+                    "headline-md": ["Inter"]
+            },
+            "fontSize": {
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "title-lg": ["18px", {"lineHeight": "24px", "fontWeight": "500"}],
+                    "headline-md": ["22px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "headline-md-mobile": ["20px", {"lineHeight": "26px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #131313;
+            color: #e5e2e1;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .matrix-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background min-h-screen pb-32">
+<!-- Top App Bar -->
+<header class="bg-background sticky top-0 z-40 border-b border-outline-variant flex justify-between items-center px-margin py-base w-full max-w-full">
+<div class="flex items-center gap-base">
+<span class="material-symbols-outlined text-primary" data-icon="nightlight">nightlight</span>
+<h1 class="font-headline-md text-headline-md-mobile font-semibold text-primary">打卡记录</h1>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="bar_chart">bar_chart</span>
+</button>
+</header>
+<main class="px-margin pt-lg space-y-lg max-w-2xl mx-auto">
+<!-- Stats Summary Section -->
+<section class="flex gap-gutter">
+<div class="flex-1 bg-surface-container p-md rounded-xl border border-outline-variant">
+<p class="font-label-md text-label-md text-on-surface-variant">连续打卡</p>
+<div class="flex items-baseline gap-xs mt-xs">
+<span class="font-headline-lg text-headline-lg text-primary">7</span>
+<span class="font-body-md text-body-md text-on-surface-variant">天</span>
+</div>
+</div>
+<div class="flex-1 bg-surface-container p-md rounded-xl border border-outline-variant">
+<p class="font-label-md text-label-md text-on-surface-variant">累计记录</p>
+<div class="flex items-baseline gap-xs mt-xs">
+<span class="font-headline-lg text-headline-lg text-on-surface">120</span>
+<span class="font-body-md text-body-md text-on-surface-variant">条</span>
+</div>
+</div>
+</section>
+<!-- Calendar Matrix Card -->
+<section class="bg-surface-container p-md rounded-xl border border-outline-variant animate-fade-in">
+<div class="flex justify-between items-center mb-md">
+<h2 class="font-title-lg text-title-lg text-on-surface">近35日表现</h2>
+<div class="flex gap-sm">
+<div class="flex items-center gap-xs">
+<div class="matrix-dot bg-secondary-container"></div>
+<span class="text-[10px] text-on-surface-variant">达标</span>
+</div>
+<div class="flex items-center gap-xs">
+<div class="matrix-dot bg-error-container"></div>
+<span class="text-[10px] text-on-surface-variant">未达标</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-7 gap-y-gutter gap-x-0 justify-items-center">
+<!-- Matrix Generation (Mock Data for 35 days) -->
+<!-- We'll use a loop-like pattern in HTML for simplicity -->
+<!-- Success states use bg-secondary-container, failures use bg-error-container, empty uses bg-surface-container-highest -->
+<script>
+                    const matrixContainer = document.currentScript.parentElement;
+                    const states = [
+                        'bg-secondary-container', 'bg-secondary-container', 'bg-secondary-container', 'bg-error-container', 'bg-secondary-container', 'bg-secondary-container', 'bg-secondary-container',
+                        'bg-secondary-container', 'bg-surface-variant', 'bg-secondary-container', 'bg-secondary-container', 'bg-error-container', 'bg-secondary-container', 'bg-secondary-container',
+                        'bg-secondary-container', 'bg-secondary-container', 'bg-secondary-container', 'bg-secondary-container', 'bg-secondary-container', 'bg-secondary-container', 'bg-surface-variant',
+                        'bg-secondary-container', 'bg-secondary-container', 'bg-error-container', 'bg-secondary-container', 'bg-secondary-container', 'bg-secondary-container', 'bg-secondary-container',
+                        'bg-secondary-container', 'bg-secondary-container', 'bg-secondary-container', 'bg-secondary-container', 'bg-secondary-container', 'bg-secondary-container', 'bg-secondary-container'
+                    ];
+                    states.forEach(state => {
+                        document.write(`<div class="matrix-dot ${state}"></div>`);
+                    });
+                </script>
+</div>
+<div class="flex justify-between mt-md px-xs">
+<span class="text-[10px] text-on-surface-variant">5周前</span>
+<span class="text-[10px] text-on-surface-variant">今天</span>
+</div>
+</section>
+<!-- Recent History List -->
+<section class="space-y-base animate-fade-in" style="animation-delay: 0.1s;">
+<h2 class="font-title-lg text-title-lg text-on-surface px-xs">最近历史</h2>
+<div class="space-y-gutter">
+<!-- History Item 1 -->
+<div class="bg-surface-container-low p-md rounded-xl border border-outline-variant flex items-center justify-between group transition-all hover:bg-surface-container-high">
+<div class="flex flex-col">
+<span class="font-body-md text-body-md text-on-surface">2023年10月24日</span>
+<div class="flex items-center gap-base mt-xs">
+<span class="font-label-md text-label-md text-on-surface-variant">入睡: 23:15</span>
+<span class="font-label-md text-label-md text-on-surface-variant">时长: 7h 30m</span>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<span class="px-sm py-xs bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded-lg">已达标</span>
+<button class="w-8 h-8 flex items-center justify-center rounded-full text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors opacity-0 group-hover:opacity-100" onclick="showDeleteModal('2023-10-24')">
+<span class="material-symbols-outlined text-[20px]" data-icon="delete">delete</span>
+</button>
+</div>
+</div>
+<!-- History Item 2 -->
+<div class="bg-surface-container-low p-md rounded-xl border border-outline-variant flex items-center justify-between group transition-all hover:bg-surface-container-high">
+<div class="flex flex-col">
+<span class="font-body-md text-body-md text-on-surface">2023年10月23日</span>
+<div class="flex items-center gap-base mt-xs">
+<span class="font-label-md text-label-md text-on-surface-variant">入睡: 00:45</span>
+<span class="font-label-md text-label-md text-on-surface-variant">时长: 6h 15m</span>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<span class="px-sm py-xs bg-error-container text-on-error-container text-[10px] font-bold rounded-lg">未达标</span>
+<button class="w-8 h-8 flex items-center justify-center rounded-full text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors opacity-0 group-hover:opacity-100" onclick="showDeleteModal('2023-10-23')">
+<span class="material-symbols-outlined text-[20px]" data-icon="delete">delete</span>
+</button>
+</div>
+</div>
+<!-- History Item 3 -->
+<div class="bg-surface-container-low p-md rounded-xl border border-outline-variant flex items-center justify-between group transition-all hover:bg-surface-container-high">
+<div class="flex flex-col">
+<span class="font-body-md text-body-md text-on-surface">2023年10月22日</span>
+<div class="flex items-center gap-base mt-xs">
+<span class="font-label-md text-label-md text-on-surface-variant">入睡: 22:50</span>
+<span class="font-label-md text-label-md text-on-surface-variant">时长: 8h 00m</span>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<span class="px-sm py-xs bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded-lg">已达标</span>
+<button class="w-8 h-8 flex items-center justify-center rounded-full text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors opacity-0 group-hover:opacity-100" onclick="showDeleteModal('2023-10-22')">
+<span class="material-symbols-outlined text-[20px]" data-icon="delete">delete</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Delete Confirmation Modal -->
+<div class="fixed inset-0 z-50 flex items-center justify-center px-margin bg-black/60 backdrop-blur-sm hidden" id="deleteModal">
+<div class="bg-surface-container-high w-full max-w-sm rounded-xl border border-outline-variant p-lg animate-fade-in">
+<h3 class="font-headline-md text-on-surface mb-base">确认删除？</h3>
+<p class="font-body-md text-on-surface-variant mb-xl">此操作将永久删除该条睡眠记录，且无法恢复。</p>
+<div class="flex gap-md justify-end">
+<button class="px-lg py-sm font-label-md text-on-surface-variant hover:bg-surface-variant rounded-xl transition-colors" onclick="hideDeleteModal()">
+                    取消
+                </button>
+<button class="px-lg py-sm font-label-md bg-error text-on-error rounded-xl hover:bg-opacity-90 transition-colors" onclick="confirmDelete()">
+                    删除
+                </button>
+</div>
+</div>
+</div>
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-center px-margin py-xs bg-surface-container-low border-t border-outline-variant rounded-t-xl">
+<!-- Inactive: 今晚 -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-lg py-xs hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined mb-1" data-icon="bedtime">bedtime</span>
+<span class="font-label-md text-label-md">今晚</span>
+</button>
+<!-- Active: 记录 -->
+<button class="flex flex-col items-center justify-center bg-secondary-container dark:bg-secondary-container text-on-secondary-container dark:text-on-secondary-container rounded-full px-lg py-xs scale-95 transition-transform duration-200">
+<span class="material-symbols-outlined mb-1" data-icon="history" style="font-variation-settings: 'FILL' 1;">history</span>
+<span class="font-label-md text-label-md">记录</span>
+</button>
+</nav>
+<script>
+        let currentDeleteId = null;
+
+        function showDeleteModal(id) {
+            currentDeleteId = id;
+            const modal = document.getElementById('deleteModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function hideDeleteModal() {
+            const modal = document.getElementById('deleteModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            currentDeleteId = null;
+        }
+
+        function confirmDelete() {
+            // Logic for deletion would go here
+            console.log('Deleting record:', currentDeleteId);
+            hideDeleteModal();
+            // Provide visual feedback (e.g., snackbar or toast could be added here)
+        }
+
+        // Close modal when clicking backdrop
+        document.getElementById('deleteModal').addEventListener('click', function(e) {
+            if (e.target === this) hideDeleteModal();
+        });
+    </script>
+</body></html>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">睡前救星</string>
+    <string name="accessibility_service_label">睡前救星监督服务</string>
+    <string name="accessibility_service_summary">在睡眠监督状态下检测前台应用并阻断分心应用。</string>
+    <string name="accessibility_service_description">睡前救星会在你主动进入睡眠监督状态或到达目标入睡时间后检测正在打开的应用，并用全屏阻断页提醒你放下手机。它不会读取输入内容或上传数据。</string>
+</resources>

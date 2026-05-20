@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SnoozeTrack - 今晚</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-surface": "#e5e2e1",
+                        "inverse-on-surface": "#313030",
+                        "error-container": "#93000a",
+                        "on-tertiary-container": "#43535b",
+                        "on-secondary": "#0a3817",
+                        "on-background": "#e5e2e1",
+                        "inverse-primary": "#21638d",
+                        "surface-tint": "#93cdfc",
+                        "on-error": "#690005",
+                        "primary-fixed": "#cbe6ff",
+                        "tertiary-fixed": "#d4e5ef",
+                        "surface-variant": "#353534",
+                        "on-tertiary-fixed-variant": "#394951",
+                        "on-surface-variant": "#c1c7cf",
+                        "background": "#131313",
+                        "on-primary": "#00344f",
+                        "on-secondary-container": "#91c193",
+                        "on-tertiary-fixed": "#0d1e25",
+                        "on-secondary-fixed-variant": "#24502c",
+                        "primary": "#c5e3ff",
+                        "secondary-fixed-dim": "#a2d3a4",
+                        "secondary-fixed": "#bdefbe",
+                        "surface-container-low": "#1c1b1b",
+                        "primary-fixed-dim": "#93cdfc",
+                        "on-surface": "#e5e2e1",
+                        "secondary": "#a2d3a4",
+                        "tertiary": "#d1e2ec",
+                        "surface-container-highest": "#353534",
+                        "surface-container": "#201f1f",
+                        "on-primary-fixed": "#001e30",
+                        "on-primary-container": "#08557e",
+                        "error": "#ffb4ab",
+                        "outline-variant": "#41474e",
+                        "on-secondary-fixed": "#002109",
+                        "tertiary-container": "#b5c6d0",
+                        "surface-dim": "#131313",
+                        "surface-container-high": "#2a2a2a",
+                        "secondary-container": "#24502c",
+                        "on-error-container": "#ffdad6",
+                        "primary-container": "#90caf9",
+                        "outline": "#8b9199",
+                        "surface-container-lowest": "#0e0e0e",
+                        "tertiary-fixed-dim": "#b8c9d3",
+                        "on-tertiary": "#23333a",
+                        "surface-bright": "#393939",
+                        "surface": "#131313",
+                        "on-primary-fixed-variant": "#004b71"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "8px",
+                        "lg": "8px",
+                        "xl": "8px",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "xs": "4px",
+                        "base": "8px",
+                        "lg": "24px",
+                        "xl": "32px",
+                        "gutter": "12px",
+                        "margin": "16px",
+                        "sm": "8px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "title-lg": ["Inter"],
+                        "headline-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "title-lg": ["18px", {"lineHeight": "24px", "fontWeight": "500"}],
+                        "headline-md": ["22px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "headline-md-mobile": ["20px", {"lineHeight": "26px", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #131313;
+            color: #e5e2e1;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .tonal-layer-1 { background-color: #1a1a1a; border: 1px solid #37474f; }
+        .tonal-layer-2 { background-color: #242424; border: 1px solid #37474f; }
+        .glass-effect { backdrop-filter: blur(8px); background: rgba(26, 26, 26, 0.8); }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body-md text-body-md pb-24">
+<!-- TopAppBar -->
+<header class="bg-background dark:bg-background border-b border-outline-variant dark:border-outline-variant docked full-width top-0 z-50 sticky">
+<div class="flex justify-between items-center px-margin py-base w-full max-w-full">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-primary dark:text-primary" style="font-variation-settings: 'FILL' 1;">nightlight</span>
+<h1 class="font-headline-md text-headline-md-mobile font-semibold text-primary dark:text-primary">SnoozeTrack</h1>
+</div>
+<div class="flex items-center gap-base">
+<div class="flex items-center bg-surface-container rounded-full px-sm py-xs border border-outline-variant">
+<span class="material-symbols-outlined text-secondary text-[16px]">bolt</span>
+<span class="font-label-md text-label-md text-on-surface ml-1">连续 5 天</span>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant dark:text-on-surface-variant p-xs hover:bg-surface-container dark:hover:bg-surface-container transition-colors duration-300 ease-in-out rounded-full">bar_chart</button>
+</div>
+</div>
+</header>
+<main class="px-margin pt-md space-y-gutter">
+<!-- Status Indicator -->
+<div class="flex items-center justify-between px-xs py-xs">
+<div class="flex items-center gap-sm">
+<div class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-secondary"></span>
+</div>
+<span class="font-label-md text-label-md text-on-surface-variant">监督已开启</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface-variant">目标: 23:00</span>
+</div>
+<!-- Main Target Bedtime Card -->
+<section class="tonal-layer-1 rounded-lg p-lg relative overflow-hidden">
+<div class="absolute -right-4 -top-4 opacity-10">
+<span class="material-symbols-outlined text-[120px]" style="font-variation-settings: 'FILL' 1;">bedtime</span>
+</div>
+<div class="relative z-10 flex flex-col items-center py-base">
+<h2 class="font-label-md text-label-md text-on-surface-variant mb-xs">目标就寝时间</h2>
+<div class="flex items-center gap-lg">
+<div class="flex flex-col gap-sm">
+<button class="p-xs text-primary hover:bg-surface-container-high rounded-full transition-colors" onclick="adjustTime('h', 1)"><span class="material-symbols-outlined">add</span></button>
+<button class="p-xs text-primary hover:bg-surface-container-high rounded-full transition-colors" onclick="adjustTime('h', -1)"><span class="material-symbols-outlined">remove</span></button>
+</div>
+<span class="text-[64px] font-bold tracking-tighter text-on-surface" id="targetTime">23:00</span>
+<div class="flex flex-col gap-sm">
+<button class="p-xs text-primary hover:bg-surface-container-high rounded-full transition-colors" onclick="adjustTime('m', 5)"><span class="material-symbols-outlined">add</span></button>
+<button class="p-xs text-primary hover:bg-surface-container-high rounded-full transition-colors" onclick="adjustTime('m', -5)"><span class="material-symbols-outlined">remove</span></button>
+</div>
+</div>
+<p class="font-body-md text-on-surface-variant mt-sm">今晚建议 22:45 开始洗漱</p>
+</div>
+</section>
+<!-- Accessibility Permission Card (Conditional) -->
+<section class="bg-error-container/20 border border-error/30 rounded-lg p-md flex items-center justify-between animate-pulse" id="permCard">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-error">warning</span>
+<div>
+<h3 class="font-title-lg text-on-surface text-[14px]">无障碍权限未开启</h3>
+<p class="font-label-md text-on-surface-variant">开启后可自动记录锁定时间</p>
+</div>
+</div>
+<div class="flex gap-xs">
+<button class="bg-error text-on-error px-md py-xs rounded-full font-label-md transition-transform active:scale-95">去开启</button>
+<button class="p-xs text-on-surface-variant" onclick="document.getElementById('permCard').style.display='none'"><span class="material-symbols-outlined">refresh</span></button>
+</div>
+</section>
+<!-- Tonight's Check-in Table -->
+<section class="tonal-layer-1 rounded-lg overflow-hidden">
+<div class="px-md py-base border-b border-outline-variant flex items-center gap-xs">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">calendar_today</span>
+<h2 class="font-title-lg text-on-surface text-[16px]">今晚打卡记录</h2>
+</div>
+<div class="divide-y divide-outline-variant">
+<div class="flex justify-between items-center p-md">
+<span class="font-body-md text-on-surface-variant">睡前</span>
+<span class="font-body-md text-on-surface">-- : --</span>
+</div>
+<div class="flex justify-between items-center p-md">
+<span class="font-body-md text-on-surface-variant">晨起</span>
+<span class="font-body-md text-on-surface">-- : --</span>
+</div>
+<div class="flex justify-between items-center p-md">
+<span class="font-body-md text-on-surface-variant">时长</span>
+<span class="font-body-md text-on-surface">0h 0m</span>
+</div>
+<div class="flex justify-between items-center p-md">
+<span class="font-body-md text-on-surface-variant">是否达标</span>
+<span class="material-symbols-outlined text-outline">pending</span>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="grid grid-cols-2 gap-gutter p-md">
+<button class="bg-primary text-on-primary py-md rounded-lg font-title-lg flex items-center justify-center gap-xs transition-transform active:scale-95 shadow-lg shadow-primary/10">
+<span class="material-symbols-outlined">bedtime</span>
+                    我要睡了
+                </button>
+<button class="border border-outline text-secondary py-md rounded-lg font-title-lg flex items-center justify-center gap-xs transition-transform active:scale-95">
+<span class="material-symbols-outlined">sunny</span>
+                    我起床了
+                </button>
+</div>
+</section>
+<!-- Decorative Bento Visuals -->
+<div class="grid grid-cols-2 gap-gutter h-32">
+<div class="tonal-layer-1 rounded-lg p-md flex flex-col justify-between">
+<span class="font-label-md text-on-surface-variant uppercase tracking-wider">睡眠质量</span>
+<div class="flex items-baseline gap-xs">
+<span class="text-headline-md text-secondary">A+</span>
+<span class="text-label-md text-on-surface-variant">昨日</span>
+</div>
+</div>
+<div class="tonal-layer-1 rounded-lg p-md flex flex-col justify-between overflow-hidden relative">
+<span class="font-label-md text-on-surface-variant uppercase tracking-wider">环境光线</span>
+<div class="flex items-baseline gap-xs">
+<span class="text-headline-md text-on-surface">12</span>
+<span class="text-label-md text-on-surface-variant">Lux</span>
+</div>
+<div class="absolute bottom-0 left-0 w-full h-1 bg-secondary/20">
+<div class="h-full bg-secondary w-1/4"></div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-center px-margin py-xs bg-surface-container-low border-t border-outline-variant dark:border-outline-variant rounded-t-xl">
+<!-- Tab: 今晚 (Active) -->
+<a class="flex flex-col items-center justify-center bg-secondary-container dark:bg-secondary-container text-on-secondary-container dark:text-on-secondary-container rounded-full px-lg py-xs Active: scale-95 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">bedtime</span>
+<span class="font-label-md text-label-md mt-1">今晚</span>
+</a>
+<!-- Tab: 记录 -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant px-lg py-xs hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="font-label-md text-label-md mt-1">记录</span>
+</a>
+</nav>
+<script>
+        let hour = 23;
+        let minute = 0;
+
+        function adjustTime(type, delta) {
+            if (type === 'h') {
+                hour = (hour + delta + 24) % 24;
+            } else {
+                minute = (minute + delta + 60) % 60;
+            }
+            const displayH = hour.toString().padStart(2, '0');
+            const displayM = minute.toString().padStart(2, '0');
+            document.getElementById('targetTime').innerText = `${displayH}:${displayM}`;
+            
+            // Subtle haptic feedback imitation
+            document.getElementById('targetTime').style.transform = 'scale(1.1)';
+            setTimeout(() => {
+                document.getElementById('targetTime').style.transform = 'scale(1)';
+            }, 100);
+        }
+
+        // Pulse effect for the active card
+        setInterval(() => {
+            const circle = document.querySelector('.animate-ping');
+            if (circle) {
+                circle.classList.remove('animate-ping');
+                void circle.offsetWidth; 
+                circle.classList.add('animate-ping');
+            }
+        }, 3000);
+    </script>
+</body></html>
