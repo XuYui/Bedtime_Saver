@@ -30,6 +30,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -46,12 +47,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bedtimesaver.data.DailySleepRecord
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -86,6 +90,7 @@ fun HomeScreen(
     onSleepClick: () -> Unit,
     onWakeClick: () -> Unit,
     onDeleteRecord: (String) -> Unit,
+    onSupplementRecord: (LocalDate, LocalTime, LocalTime) -> Unit,
     onTargetHourDelta: (Int) -> Unit,
     onTargetMinuteDelta: (Int) -> Unit,
     onOpenAccessibilityClick: () -> Unit,
@@ -94,6 +99,7 @@ fun HomeScreen(
 ) {
     var section by rememberSaveable { mutableStateOf(HomeSection.Tonight) }
     var pendingDelete by remember { mutableStateOf<DailySleepRecord?>(null) }
+    var supplementDialogVisible by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -120,6 +126,7 @@ fun HomeScreen(
             HomeSection.Records -> RecordsPanel(
                 uiState = uiState,
                 onDeleteClick = { pendingDelete = it },
+                onSupplementClick = { supplementDialogVisible = true },
                 modifier = Modifier.padding(innerPadding),
             )
         }
@@ -132,6 +139,16 @@ fun HomeScreen(
             onConfirm = {
                 onDeleteRecord(record.date)
                 pendingDelete = null
+            },
+        )
+    }
+
+    if (supplementDialogVisible) {
+        SupplementRecordDialog(
+            onDismiss = { supplementDialogVisible = false },
+            onConfirm = { date, bedtime, wakeTime ->
+                onSupplementRecord(date, bedtime, wakeTime)
+                supplementDialogVisible = false
             },
         )
     }
@@ -171,7 +188,6 @@ private fun TonightPanel(
             StatusRow(uiState)
             TargetTimeCard(
                 targetText = uiState.targetBedtime.displayText(),
-                suggestionText = uiState.targetBedtime.withMinuteDelta(-15).displayText(),
                 onHourDelta = onTargetHourDelta,
                 onMinuteDelta = onTargetMinuteDelta,
             )
@@ -186,6 +202,7 @@ private fun TonightPanel(
                 onWakeClick = onWakeClick,
             )
             QuickStatsRow(uiState = uiState)
+            SleepQualityStandardCard()
         }
     }
 }
@@ -194,6 +211,7 @@ private fun TonightPanel(
 private fun RecordsPanel(
     uiState: HomeUiState,
     onDeleteClick: (DailySleepRecord) -> Unit,
+    onSupplementClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -213,7 +231,11 @@ private fun RecordsPanel(
             verticalArrangement = Arrangement.spacedBy(22.dp),
         ) {
             StatsSummary(uiState)
-            CalendarCard(days = uiState.historyDays)
+            SupplementActionCard(onSupplementClick = onSupplementClick)
+            CalendarCard(
+                title = uiState.calendarTitle,
+                days = uiState.historyDays,
+            )
             RecentRecordsCard(
                 records = uiState.records.take(10),
                 onDeleteClick = onDeleteClick,
@@ -328,7 +350,6 @@ private fun StreakChip(streak: Int) {
 @Composable
 private fun TargetTimeCard(
     targetText: String,
-    suggestionText: String,
     onHourDelta: (Int) -> Unit,
     onMinuteDelta: (Int) -> Unit,
 ) {
@@ -378,11 +399,6 @@ private fun TargetTimeCard(
                         onMinus = { onMinuteDelta(-5) },
                     )
                 }
-                Text(
-                    text = "今晚建议 $suggestionText 开始洗漱",
-                    color = BedtimeTokens.muted,
-                    style = MaterialTheme.typography.bodyLarge,
-                )
             }
         }
     }
@@ -631,11 +647,7 @@ private fun QuickStatsRow(uiState: HomeUiState) {
     ) {
         MiniStatCard(
             label = "睡眠质量",
-            value = when {
-                uiState.activeRecord?.sleepDurationMinutes == null -> "待完成"
-                uiState.activeRecord.sleepDurationMinutes >= 7 * 60 -> "A+"
-                else -> "B"
-            },
+            value = sleepQualityGrade(uiState.activeRecord),
             caption = if (uiState.activeRecord?.sleepDurationMinutes == null) "今晚" else "本次",
             modifier = Modifier.weight(1f),
         )
@@ -644,6 +656,67 @@ private fun QuickStatsRow(uiState: HomeUiState) {
             value = if (uiState.activeRecord?.metGoal == true) "达标" else "待定",
             caption = uiState.targetBedtime.displayText(),
             modifier = Modifier.weight(1f),
+        )
+    }
+}
+
+@Composable
+private fun SleepQualityStandardCard() {
+    TonalCard {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            Text(
+                text = "睡眠质量评测标准",
+                color = BedtimeTokens.text,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+            )
+            QualityRuleRow("A+", "7-9h 且早睡达标")
+            QualityRuleRow("A", "7-9h，睡眠时长充足")
+            QualityRuleRow("B", "6-7h，基本恢复")
+            QualityRuleRow("C", "少于 6h 或记录不完整")
+        }
+    }
+}
+
+@Composable
+private fun QualityRuleRow(
+    grade: String,
+    description: String,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Surface(
+            color = if (grade == "A+" || grade == "A") {
+                BedtimeTokens.greenContainer
+            } else {
+                BedtimeTokens.cardHigh
+            },
+            shape = RoundedCornerShape(6.dp),
+            border = BorderStroke(1.dp, BedtimeTokens.border),
+        ) {
+            Text(
+                text = grade,
+                color = if (grade == "A+" || grade == "A") BedtimeTokens.green else BedtimeTokens.muted,
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .width(42.dp)
+                    .padding(vertical = 6.dp),
+                textAlign = TextAlign.Center,
+            )
+        }
+        Text(
+            text = description,
+            color = BedtimeTokens.muted,
+            style = MaterialTheme.typography.bodyMedium,
         )
     }
 }
@@ -682,6 +755,49 @@ private fun MiniStatCard(
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(bottom = 3.dp),
                 )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SupplementActionCard(
+    onSupplementClick: () -> Unit,
+) {
+    TonalCard {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(14.dp),
+        ) {
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(5.dp),
+            ) {
+                Text(
+                    text = "补充打卡",
+                    color = BedtimeTokens.text,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                Text(
+                    text = "漏记时可手动补录睡眠日、入睡和起床时间",
+                    color = BedtimeTokens.muted,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
+            Button(
+                onClick = onSupplementClick,
+                shape = RoundedCornerShape(8.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = BedtimeTokens.primaryButton,
+                    contentColor = Color(0xFF06253A),
+                ),
+                contentPadding = PaddingValues(horizontal = 18.dp, vertical = 12.dp),
+            ) {
+                Text("补录")
             }
         }
     }
@@ -749,13 +865,16 @@ private fun SummaryStatCard(
 }
 
 @Composable
-private fun CalendarCard(days: List<HistoryDay>) {
+private fun CalendarCard(
+    title: String,
+    days: List<HistoryDay>,
+) {
     TonalCard {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(18.dp),
-            verticalArrangement = Arrangement.spacedBy(18.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -763,7 +882,7 @@ private fun CalendarCard(days: List<HistoryDay>) {
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
-                    text = "近35日表现",
+                    text = "打卡日历",
                     color = BedtimeTokens.text,
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.SemiBold,
@@ -773,40 +892,59 @@ private fun CalendarCard(days: List<HistoryDay>) {
                     LegendDot(color = BedtimeTokens.redContainer, text = "未达标")
                 }
             }
+            Text(
+                text = title.ifBlank { "本月" },
+                color = BedtimeTokens.muted,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium,
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                listOf("一", "二", "三", "四", "五", "六", "日").forEach {
+                    Text(
+                        text = it,
+                        modifier = Modifier.weight(1f),
+                        color = BedtimeTokens.dim,
+                        style = MaterialTheme.typography.labelMedium,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+            }
             LazyVerticalGrid(
                 columns = GridCells.Fixed(7),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(156.dp),
+                    .height(((days.size / 7).coerceAtLeast(5) * 46).dp),
                 userScrollEnabled = false,
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalArrangement = Arrangement.spacedBy(0.dp),
             ) {
                 items(days) { day ->
                     CalendarDay(day = day)
                 }
             }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Text(
-                    text = "5周前",
-                    color = BedtimeTokens.muted,
-                    style = MaterialTheme.typography.labelMedium,
-                )
-                Text(
-                    text = "今天",
-                    color = BedtimeTokens.muted,
-                    style = MaterialTheme.typography.labelMedium,
-                )
-            }
+            Text(
+                text = "历史记录长期保存在本地数据库，可在最近历史中查看和删除。",
+                color = BedtimeTokens.dim,
+                style = MaterialTheme.typography.labelMedium,
+            )
         }
     }
 }
 
 @Composable
 private fun CalendarDay(day: HistoryDay) {
+    if (day.dayOfMonth == 0) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(38.dp),
+        )
+        return
+    }
+
     val dotColor = when {
         day.record?.metGoal == true -> BedtimeTokens.greenContainer
         day.record?.bedtimeCheckInMillis != null -> BedtimeTokens.redContainer
@@ -814,15 +952,27 @@ private fun CalendarDay(day: HistoryDay) {
     }
 
     Box(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(38.dp),
         contentAlignment = Alignment.Center,
     ) {
-        Box(
-            modifier = Modifier
-                .size(10.dp)
-                .clip(CircleShape)
-                .background(dotColor),
-        )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterVertically),
+        ) {
+            Text(
+                text = day.dayOfMonth.toString(),
+                color = BedtimeTokens.muted,
+                style = MaterialTheme.typography.labelMedium,
+            )
+            Box(
+                modifier = Modifier
+                    .size(8.dp)
+                    .clip(CircleShape)
+                    .background(dotColor),
+            )
+        }
     }
 }
 
@@ -1105,7 +1255,127 @@ private fun DeleteRecordDialog(
     )
 }
 
+@Composable
+private fun SupplementRecordDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (LocalDate, LocalTime, LocalTime) -> Unit,
+) {
+    var dateText by rememberSaveable { mutableStateOf(LocalDate.now().toString()) }
+    var bedtimeText by rememberSaveable { mutableStateOf("23:00") }
+    var wakeTimeText by rememberSaveable { mutableStateOf("07:00") }
+    var attemptedSave by rememberSaveable { mutableStateOf(false) }
+
+    val parsedDate = parseDateOrNull(dateText)
+    val parsedBedtime = parseTimeOrNull(bedtimeText)
+    val parsedWakeTime = parseTimeOrNull(wakeTimeText)
+    val hasError = parsedDate == null || parsedBedtime == null || parsedWakeTime == null
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = BedtimeTokens.cardHigh,
+        titleContentColor = BedtimeTokens.text,
+        textContentColor = BedtimeTokens.muted,
+        title = {
+            Text("补充打卡")
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(
+                    text = "用于漏记时补录。保存后会覆盖同一睡眠日已有记录，并重算连续早睡天数。",
+                    color = BedtimeTokens.muted,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+                OutlinedTextField(
+                    value = dateText,
+                    onValueChange = { dateText = it.trim() },
+                    label = { Text("睡眠日期") },
+                    placeholder = { Text("2026-05-21") },
+                    isError = attemptedSave && parsedDate == null,
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                    supportingText = {
+                        if (attemptedSave && parsedDate == null) {
+                            Text("格式应为 yyyy-MM-dd")
+                        }
+                    },
+                )
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    OutlinedTextField(
+                        value = bedtimeText,
+                        onValueChange = { bedtimeText = it.trim() },
+                        label = { Text("入睡") },
+                        placeholder = { Text("23:00") },
+                        isError = attemptedSave && parsedBedtime == null,
+                        singleLine = true,
+                        modifier = Modifier.weight(1f),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                        supportingText = {
+                            if (attemptedSave && parsedBedtime == null) {
+                                Text("HH:mm")
+                            }
+                        },
+                    )
+                    OutlinedTextField(
+                        value = wakeTimeText,
+                        onValueChange = { wakeTimeText = it.trim() },
+                        label = { Text("起床") },
+                        placeholder = { Text("07:00") },
+                        isError = attemptedSave && parsedWakeTime == null,
+                        singleLine = true,
+                        modifier = Modifier.weight(1f),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                        supportingText = {
+                            if (attemptedSave && parsedWakeTime == null) {
+                                Text("HH:mm")
+                            }
+                        },
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    attemptedSave = true
+                    if (!hasError) {
+                        onConfirm(parsedDate!!, parsedBedtime!!, parsedWakeTime!!)
+                    }
+                },
+            ) {
+                Text("保存")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("取消")
+            }
+        },
+    )
+}
+
 private fun BedtimeTokens.outlineOrDim(): Color = border
+
+private fun sleepQualityGrade(record: DailySleepRecord?): String {
+    val minutes = record?.sleepDurationMinutes ?: return "待完成"
+    return when {
+        minutes in (7 * 60)..(9 * 60) && record.metGoal -> "A+"
+        minutes in (7 * 60)..(9 * 60) -> "A"
+        minutes >= 6 * 60 -> "B"
+        else -> "C"
+    }
+}
+
+private fun parseDateOrNull(value: String): LocalDate? {
+    return runCatching {
+        LocalDate.parse(value, DateTimeFormatter.ISO_LOCAL_DATE)
+    }.getOrNull()
+}
+
+private fun parseTimeOrNull(value: String): LocalTime? {
+    return runCatching {
+        LocalTime.parse(value, DateTimeFormatter.ofPattern("H:mm"))
+    }.getOrNull()
+}
 
 private fun formatTime(millis: Long?): String {
     if (millis == null) return "--:--"

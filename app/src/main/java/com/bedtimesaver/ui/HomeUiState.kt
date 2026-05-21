@@ -12,6 +12,7 @@ data class HomeUiState(
     val currentStreak: Int = 0,
     val accessibilityEnabled: Boolean = false,
     val historyDays: List<HistoryDay> = emptyList(),
+    val calendarTitle: String = "",
 )
 
 data class HistoryDay(

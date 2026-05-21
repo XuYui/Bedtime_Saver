@@ -66,7 +66,7 @@ app/src/main/java/com/bedtimesaver/
 
 ```text
 design/stitch_bedtime_saver_sleep_assistant/ # Stitch 设计稿和截图
-release/BedtimeSaver-v1.0.1.apk              # 当前发行展示包
+release/BedtimeSaver-v1.1.0.apk              # 当前发行展示包
 release/README.md                            # 当前发行包 SHA-256
 CHANGELOG.md                                 # 每次修改必须更新
 ```
@@ -150,6 +150,7 @@ Get-ChildItem release
 - `SleepRepository.checkInBed()` 负责睡前打卡、达标判断、连续天数计算、开启监督。
 - `SleepRepository.checkInWakeUp()` 负责晨起打卡、睡眠时长计算、关闭监督。
 - `SleepRepository.deleteRecord()` 负责删除误触记录，并重新计算连续天数。
+- `SleepRepository.supplementRecord()` 负责补充打卡，手动写入睡眠日、入睡时间、起床时间，并重算连续天数。
 - 删除当前监督周期记录时，要退出监督状态，避免记录不存在但仍锁定。
 - 修改 Room 表结构时，必须提升数据库版本并添加 migration，不能破坏旧数据。
 - 默认不要清空数据库、不要做 destructive migration。

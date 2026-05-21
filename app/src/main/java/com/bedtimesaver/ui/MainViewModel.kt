@@ -10,6 +10,9 @@ import com.bedtimesaver.data.SleepRepository
 import com.bedtimesaver.domain.SleepDatePolicy
 import com.bedtimesaver.service.AccessibilityPermission
 import java.time.LocalDate
+import java.time.LocalTime
+import java.time.YearMonth
+import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -42,7 +45,8 @@ class MainViewModel(
             activeRecord = activeRecord,
             currentStreak = visibleStreak(records),
             accessibilityEnabled = accessEnabled,
-            historyDays = buildHistoryDays(byDate),
+            historyDays = buildCalendarDays(byDate),
+            calendarTitle = YearMonth.now().format(DateTimeFormatter.ofPattern("yyyy年M月")),
         )
     }.stateIn(
         scope = viewModelScope,
@@ -76,6 +80,20 @@ class MainViewModel(
         }
     }
 
+    fun supplementRecord(
+        date: LocalDate,
+        bedtime: LocalTime,
+        wakeTime: LocalTime,
+    ) {
+        viewModelScope.launch {
+            repository.supplementRecord(
+                sleepDate = date,
+                bedtime = bedtime,
+                wakeTime = wakeTime,
+            )
+        }
+    }
+
     fun changeTargetHour(delta: Int) {
         repository.updateTargetBedtime(uiState.value.targetBedtime.withHourDelta(delta))
     }
@@ -89,17 +107,28 @@ class MainViewModel(
         return if (latest.metGoal) latest.streakCount else 0
     }
 
-    private fun buildHistoryDays(byDate: Map<String, DailySleepRecord>): List<HistoryDay> {
-        val anchor = SleepDatePolicy.sleepDateFor()
-        return (34 downTo 0).map { offset ->
-            val date = anchor.minusDays(offset.toLong())
+    private fun buildCalendarDays(byDate: Map<String, DailySleepRecord>): List<HistoryDay> {
+        val month = YearMonth.now()
+        val firstDay = month.atDay(1)
+        val leadingBlankCount = firstDay.dayOfWeek.value - 1
+        val days = mutableListOf<HistoryDay>()
+
+        repeat(leadingBlankCount) {
+            days += HistoryDay(date = "", dayOfMonth = 0, record = null)
+        }
+        for (day in 1..month.lengthOfMonth()) {
+            val date = month.atDay(day)
             val key = date.toString()
-            HistoryDay(
+            days += HistoryDay(
                 date = key,
-                dayOfMonth = date.dayOfMonth,
+                dayOfMonth = day,
                 record = byDate[key],
             )
         }
+        while (days.size % 7 != 0) {
+            days += HistoryDay(date = "", dayOfMonth = 0, record = null)
+        }
+        return days
     }
 
     class Factory(

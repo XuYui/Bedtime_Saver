@@ -5,7 +5,10 @@ import com.bedtimesaver.domain.SleepDatePolicy
 import com.bedtimesaver.domain.TargetBedtime
 import com.bedtimesaver.service.BedtimeAlarmReceiver
 import com.bedtimesaver.service.SleepModeStore
+import java.time.LocalDateTime
 import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
 import kotlin.math.max
 
 class SleepRepository(
@@ -60,6 +63,40 @@ class SleepRepository(
         if (SleepModeStore.getState(context).activeDate == date) {
             SleepModeStore.deactivate(context)
         }
+        rebuildStreaks()
+    }
+
+    suspend fun supplementRecord(
+        sleepDate: LocalDate,
+        bedtime: LocalTime,
+        wakeTime: LocalTime,
+    ) {
+        val target = settings.getTargetBedtime()
+        val bedtimeDate = if (bedtime.hour < 12) sleepDate.plusDays(1) else sleepDate
+        val bedtimeDateTime = LocalDateTime.of(bedtimeDate, bedtime)
+        var wakeDateTime = LocalDateTime.of(
+            if (wakeTime.hour < 12) sleepDate.plusDays(1) else sleepDate,
+            wakeTime,
+        )
+        if (!wakeDateTime.isAfter(bedtimeDateTime)) {
+            wakeDateTime = wakeDateTime.plusDays(1)
+        }
+
+        val bedtimeMillis = bedtimeDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        val wakeMillis = wakeDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        val metGoal = SleepDatePolicy.isAtOrBeforeTarget(bedtimeMillis, target)
+        val duration = max(0L, (wakeMillis - bedtimeMillis) / MILLIS_PER_MINUTE)
+
+        dao.upsert(
+            DailySleepRecord(
+                date = sleepDate.toString(),
+                bedtimeCheckInMillis = bedtimeMillis,
+                wakeUpCheckInMillis = wakeMillis,
+                targetBedtimeMinutes = target.asMinutesOfDay(),
+                metGoal = metGoal,
+                sleepDurationMinutes = duration,
+            ),
+        )
         rebuildStreaks()
     }
 

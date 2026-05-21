@@ -42,6 +42,7 @@ class MainActivity : ComponentActivity() {
                         onSleepClick = viewModel::checkInBed,
                         onWakeClick = viewModel::checkInWakeUp,
                         onDeleteRecord = viewModel::deleteRecord,
+                        onSupplementRecord = viewModel::supplementRecord,
                         onTargetHourDelta = viewModel::changeTargetHour,
                         onTargetMinuteDelta = viewModel::changeTargetMinute,
                         onOpenAccessibilityClick = {
