@@ -8,10 +8,14 @@ import com.bedtimesaver.data.BedtimeSettings
 class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent?) {
         if (intent?.action == Intent.ACTION_BOOT_COMPLETED) {
+            val settings = BedtimeSettings(context)
             BedtimeAlarmReceiver.scheduleNext(
                 context,
-                BedtimeSettings(context).getTargetBedtime(),
+                settings.getTargetBedtime(),
             )
+            if (SleepModeStore.getState(context).isActive) {
+                WakeAlarmReceiver.scheduleNextWake(context, settings.getWakeAlarmTime())
+            }
         }
     }
 }

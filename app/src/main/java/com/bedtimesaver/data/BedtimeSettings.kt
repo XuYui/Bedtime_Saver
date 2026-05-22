@@ -27,6 +27,19 @@ class BedtimeSettings(context: Context) {
         }
     }.distinctUntilChanged()
 
+    val wakeAlarmTimeFlow: Flow<TargetBedtime> = callbackFlow {
+        val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+            if (key == KEY_WAKE_HOUR || key == KEY_WAKE_MINUTE) {
+                trySend(getWakeAlarmTime())
+            }
+        }
+        trySend(getWakeAlarmTime())
+        prefs.registerOnSharedPreferenceChangeListener(listener)
+        awaitClose {
+            prefs.unregisterOnSharedPreferenceChangeListener(listener)
+        }
+    }.distinctUntilChanged()
+
     fun getTargetBedtime(): TargetBedtime {
         return TargetBedtime(
             hour = prefs.getInt(KEY_TARGET_HOUR, 23).coerceIn(0, 23),
@@ -41,9 +54,25 @@ class BedtimeSettings(context: Context) {
             .apply()
     }
 
+    fun getWakeAlarmTime(): TargetBedtime {
+        return TargetBedtime(
+            hour = prefs.getInt(KEY_WAKE_HOUR, 7).coerceIn(0, 23),
+            minute = prefs.getInt(KEY_WAKE_MINUTE, 0).coerceIn(0, 59),
+        )
+    }
+
+    fun setWakeAlarmTime(wakeAlarmTime: TargetBedtime) {
+        prefs.edit()
+            .putInt(KEY_WAKE_HOUR, wakeAlarmTime.hour.coerceIn(0, 23))
+            .putInt(KEY_WAKE_MINUTE, wakeAlarmTime.minute.coerceIn(0, 59))
+            .apply()
+    }
+
     companion object {
         private const val PREFS_NAME = "bedtime_settings"
         private const val KEY_TARGET_HOUR = "target_hour"
         private const val KEY_TARGET_MINUTE = "target_minute"
+        private const val KEY_WAKE_HOUR = "wake_hour"
+        private const val KEY_WAKE_MINUTE = "wake_minute"
     }
 }

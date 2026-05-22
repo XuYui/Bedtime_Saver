@@ -30,9 +30,10 @@ class MainViewModel(
     val uiState = combine(
         repository.recordsFlow,
         repository.targetBedtimeFlow,
+        repository.wakeAlarmTimeFlow,
         repository.sleepModeFlow,
         accessibilityEnabled,
-    ) { records, target, sleepMode, accessEnabled ->
+    ) { records, target, wakeAlarmTime, sleepMode, accessEnabled ->
         val byDate = records.associateBy { it.date }
         val currentSleepDate = SleepDatePolicy.sleepDateStringFor()
         val activeDate = sleepMode.activeDate ?: currentSleepDate
@@ -40,6 +41,7 @@ class MainViewModel(
 
         HomeUiState(
             targetBedtime = target,
+            wakeAlarmTime = wakeAlarmTime,
             records = records,
             sleepModeState = sleepMode,
             activeRecord = activeRecord,
@@ -100,6 +102,14 @@ class MainViewModel(
 
     fun changeTargetMinute(delta: Int) {
         repository.updateTargetBedtime(uiState.value.targetBedtime.withMinuteDelta(delta))
+    }
+
+    fun changeWakeAlarmHour(delta: Int) {
+        repository.updateWakeAlarmTime(uiState.value.wakeAlarmTime.withHourDelta(delta))
+    }
+
+    fun changeWakeAlarmMinute(delta: Int) {
+        repository.updateWakeAlarmTime(uiState.value.wakeAlarmTime.withMinuteDelta(delta))
     }
 
     private fun visibleStreak(records: List<DailySleepRecord>): Int {
