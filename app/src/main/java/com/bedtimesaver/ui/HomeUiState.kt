@@ -6,7 +6,6 @@ import com.bedtimesaver.service.SleepModeState
 
 data class HomeUiState(
     val targetBedtime: TargetBedtime = TargetBedtime(),
-    val wakeAlarmTime: TargetBedtime = TargetBedtime(hour = 7, minute = 0),
     val records: List<DailySleepRecord> = emptyList(),
     val sleepModeState: SleepModeState = SleepModeState(),
     val activeRecord: DailySleepRecord? = null,

@@ -45,8 +45,6 @@ class MainActivity : ComponentActivity() {
                         onSupplementRecord = viewModel::supplementRecord,
                         onTargetHourDelta = viewModel::changeTargetHour,
                         onTargetMinuteDelta = viewModel::changeTargetMinute,
-                        onWakeAlarmHourDelta = viewModel::changeWakeAlarmHour,
-                        onWakeAlarmMinuteDelta = viewModel::changeWakeAlarmMinute,
                         onOpenAccessibilityClick = {
                             startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
                         },

@@ -41,6 +41,16 @@ object SleepModeStore {
         "com.samsung.android.app.telephonyui",
         "com.google.android.dialer",
         "com.android.dialer",
+        "com.android.deskclock",
+        "com.google.android.deskclock",
+        "com.sec.android.app.clockpackage",
+        "com.miui.clock",
+        "com.huawei.deskclock",
+        "com.coloros.alarmclock",
+        "com.oppo.alarmclock",
+        "com.vivo.alarmclock",
+        "com.oneplus.deskclock",
+        "com.motorola.timeweatherwidget",
     )
 
     fun observe(context: Context): Flow<SleepModeState> = callbackFlow {

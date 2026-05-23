@@ -5,7 +5,6 @@ import com.bedtimesaver.domain.SleepDatePolicy
 import com.bedtimesaver.domain.TargetBedtime
 import com.bedtimesaver.service.BedtimeAlarmReceiver
 import com.bedtimesaver.service.SleepModeStore
-import com.bedtimesaver.service.WakeAlarmReceiver
 import java.time.LocalDateTime
 import java.time.LocalDate
 import java.time.LocalTime
@@ -19,7 +18,6 @@ class SleepRepository(
 ) {
     val recordsFlow = dao.observeRecords()
     val targetBedtimeFlow = settings.targetBedtimeFlow
-    val wakeAlarmTimeFlow = settings.wakeAlarmTimeFlow
     val sleepModeFlow = SleepModeStore.observe(context)
 
     suspend fun checkInBed(nowMillis: Long = System.currentTimeMillis()) {
@@ -40,7 +38,6 @@ class SleepRepository(
 
         dao.upsert(updated)
         SleepModeStore.activate(context, activeDate = date, startedAtMillis = nowMillis)
-        WakeAlarmReceiver.scheduleNextWake(context, settings.getWakeAlarmTime())
         BedtimeAlarmReceiver.cancel(context)
     }
 
@@ -58,7 +55,6 @@ class SleepRepository(
 
         dao.upsert(record)
         SleepModeStore.deactivate(context)
-        WakeAlarmReceiver.cancel(context)
         BedtimeAlarmReceiver.cancel(context)
     }
 
@@ -66,7 +62,6 @@ class SleepRepository(
         dao.deleteByDate(date)
         if (SleepModeStore.getState(context).activeDate == date) {
             SleepModeStore.deactivate(context)
-            WakeAlarmReceiver.cancel(context)
         }
         rebuildStreaks()
     }
@@ -110,18 +105,8 @@ class SleepRepository(
         BedtimeAlarmReceiver.cancel(context)
     }
 
-    fun updateWakeAlarmTime(wakeAlarmTime: TargetBedtime) {
-        settings.setWakeAlarmTime(wakeAlarmTime)
-        if (SleepModeStore.getState(context).isActive) {
-            WakeAlarmReceiver.scheduleNextWake(context, wakeAlarmTime)
-        }
-    }
-
     fun syncScheduledAlarms() {
         BedtimeAlarmReceiver.cancel(context)
-        if (SleepModeStore.getState(context).isActive) {
-            WakeAlarmReceiver.scheduleNextWake(context, settings.getWakeAlarmTime())
-        }
     }
 
     private suspend fun computeStreak(date: String, metGoal: Boolean): Int {

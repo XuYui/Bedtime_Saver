@@ -13,7 +13,7 @@
 ## 项目亮点
 
 - **睡眠监督模式**：用户点击“我要睡了”后，App 才进入监督状态；目标入睡时间只用于早睡达标判定。
-- **晨起闹钟闭环**：睡前打卡后自动调度晨起闹钟，响铃页支持铃声、震动和关闭后自动晨起打卡。
+- **系统闹钟放行**：监督状态下放行常见系统时钟/闹钟应用，保证闹钟响起和关闭不被拦截。
 - **无障碍应用拦截**：通过 `AccessibilityService` 监听前台窗口变化，监督状态下打开非白名单应用会立即弹出全屏阻断页。
 - **60 秒清醒挑战**：用户坚持要解锁时，需要完成 60 秒倒计时，完成后仅获得 5 分钟临时解锁。
 - **早睡打卡系统**：Room 本地数据库记录睡前打卡、晨起打卡、实际睡眠时长、是否达标、连续天数。
@@ -30,7 +30,6 @@
 - Room + KSP
 - MVVM + StateFlow
 - AccessibilityService
-- AlarmManager
 - SharedPreferences for lightweight runtime settings
 
 ## 开发协作
@@ -43,14 +42,12 @@
 
 ```mermaid
 flowchart TD
-    UI["Compose UI\nMainActivity / HomeScreen / BlockActivity / AlarmRingActivity"]
+    UI["Compose UI\nMainActivity / HomeScreen / BlockActivity"]
     VM["MainViewModel\nStateFlow UI State"]
-    Repo["SleepRepository\n打卡、统计、监督与闹钟调度"]
+    Repo["SleepRepository\n打卡、统计、监督状态同步"]
     Room["Room DB\nDailySleepRecord"]
-    Settings["BedtimeSettings\n目标入睡时间 / 晨起闹钟"]
+    Settings["BedtimeSettings\n目标入睡时间"]
     Store["SleepModeStore\n监督状态"]
-    Alarm["AlarmManager\n晨起闹钟"]
-    Wake["WakeAlarmReceiver\n晨起响铃触发"]
     A11y["AccessibilityService\n前台应用检测"]
 
     UI --> VM
@@ -58,9 +55,6 @@ flowchart TD
     Repo --> Room
     Repo --> Settings
     Repo --> Store
-    Repo --> Alarm
-    Alarm --> Wake
-    Wake --> UI
     A11y --> Store
     A11y --> UI
 ```
@@ -69,17 +63,18 @@ flowchart TD
 
 1. 安装 APK 后打开“睡前救星”。
 2. 点击“去开启”，在系统无障碍设置里启用“睡前救星监督服务”。
-3. 设置目标入睡时间和晨起闹钟时间。
-4. 上床时点击“我要睡了”，App 会记录睡前打卡、进入监督状态，并调度晨起闹钟。
+3. 设置目标入睡时间。
+4. 上床时点击“我要睡了”，App 会记录睡前打卡并进入监督状态。
 5. 监督状态下打开分心应用会出现全屏阻断页。
-6. 第二天闹钟响起后点击“关闭闹钟并完成起床打卡”，或手动点击“我起床了”，完成晨起打卡并计算睡眠时长。
-7. 如果漏记或误触，可在“记录”板块补充打卡或删除对应日期记录。
+6. 系统闹钟响起时可正常进入时钟/闹钟应用关闭闹钟。
+7. 第二天打开 App 点击“我起床了”，完成晨起打卡并计算睡眠时长。
+8. 如果漏记或误触，可在“记录”板块补充打卡或删除对应日期记录。
 
 ## APK 产物
 
 已生成独立发行目录：
 
-- 发行安装包：`release/BedtimeSaver-v1.2.1.apk`
+- 发行安装包：`release/BedtimeSaver-v1.2.2.apk`
 - 校验信息：`release/README.md`
 
 `portfolio` 使用 debug keystore 签名，适合本机安装、演示和作品集展示；正式发布请使用自己的 release keystore 重新签名。

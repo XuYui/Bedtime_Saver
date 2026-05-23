@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:allowBackup="true"
@@ -15,15 +14,6 @@
 
         <activity
             android:name=".ui.BlockActivity"
-            android:excludeFromRecents="true"
-            android:exported="false"
-            android:launchMode="singleTask"
-            android:showWhenLocked="true"
-            android:turnScreenOn="true"
-            tools:ignore="Instantiatable" />
-
-        <activity
-            android:name=".ui.AlarmRingActivity"
             android:excludeFromRecents="true"
             android:exported="false"
             android:launchMode="singleTask"
@@ -57,10 +47,6 @@
 
         <receiver
             android:name=".service.BedtimeAlarmReceiver"
-            android:exported="false" />
-
-        <receiver
-            android:name=".service.WakeAlarmReceiver"
             android:exported="false" />
 
         <receiver

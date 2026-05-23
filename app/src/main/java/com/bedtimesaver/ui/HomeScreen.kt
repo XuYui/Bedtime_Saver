@@ -93,8 +93,6 @@ fun HomeScreen(
     onSupplementRecord: (LocalDate, LocalTime, LocalTime) -> Unit,
     onTargetHourDelta: (Int) -> Unit,
     onTargetMinuteDelta: (Int) -> Unit,
-    onWakeAlarmHourDelta: (Int) -> Unit,
-    onWakeAlarmMinuteDelta: (Int) -> Unit,
     onOpenAccessibilityClick: () -> Unit,
     onRefreshAccessibilityClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -120,8 +118,6 @@ fun HomeScreen(
                 onWakeClick = onWakeClick,
                 onTargetHourDelta = onTargetHourDelta,
                 onTargetMinuteDelta = onTargetMinuteDelta,
-                onWakeAlarmHourDelta = onWakeAlarmHourDelta,
-                onWakeAlarmMinuteDelta = onWakeAlarmMinuteDelta,
                 onOpenAccessibilityClick = onOpenAccessibilityClick,
                 onRefreshAccessibilityClick = onRefreshAccessibilityClick,
                 modifier = Modifier.padding(innerPadding),
@@ -165,8 +161,6 @@ private fun TonightPanel(
     onWakeClick: () -> Unit,
     onTargetHourDelta: (Int) -> Unit,
     onTargetMinuteDelta: (Int) -> Unit,
-    onWakeAlarmHourDelta: (Int) -> Unit,
-    onWakeAlarmMinuteDelta: (Int) -> Unit,
     onOpenAccessibilityClick: () -> Unit,
     onRefreshAccessibilityClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -196,11 +190,6 @@ private fun TonightPanel(
                 targetText = uiState.targetBedtime.displayText(),
                 onHourDelta = onTargetHourDelta,
                 onMinuteDelta = onTargetMinuteDelta,
-            )
-            WakeAlarmCard(
-                wakeText = uiState.wakeAlarmTime.displayText(),
-                onHourDelta = onWakeAlarmHourDelta,
-                onMinuteDelta = onWakeAlarmMinuteDelta,
             )
             PermissionNotice(
                 enabled = uiState.accessibilityEnabled,
@@ -411,126 +400,6 @@ private fun TargetTimeCard(
                     )
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun WakeAlarmCard(
-    wakeText: String,
-    onHourDelta: (Int) -> Unit,
-    onMinuteDelta: (Int) -> Unit,
-) {
-    TonalCard(
-        modifier = Modifier.fillMaxWidth(),
-        color = BedtimeTokens.cardLow,
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(18.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(18.dp),
-        ) {
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    Text(
-                        text = "◷",
-                        color = BedtimeTokens.green,
-                        fontSize = 24.sp,
-                        lineHeight = 24.sp,
-                    )
-                    Text(
-                        text = "晨起闹钟",
-                        color = BedtimeTokens.text,
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                }
-                Text(
-                    text = "点击“我要睡了”后，系统会在这个时间响铃；关闭闹钟会自动完成晨起打卡。",
-                    color = BedtimeTokens.muted,
-                    style = MaterialTheme.typography.bodyMedium,
-                    lineHeight = 22.sp,
-                )
-            }
-            Column(
-                horizontalAlignment = Alignment.End,
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                Text(
-                    text = wakeText,
-                    color = BedtimeTokens.primary,
-                    fontSize = 42.sp,
-                    lineHeight = 46.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.End,
-                )
-                TimeNudgeRow(
-                    label = "时",
-                    onMinus = { onHourDelta(-1) },
-                    onPlus = { onHourDelta(1) },
-                )
-                TimeNudgeRow(
-                    label = "分",
-                    onMinus = { onMinuteDelta(-5) },
-                    onPlus = { onMinuteDelta(5) },
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun TimeNudgeRow(
-    label: String,
-    onMinus: () -> Unit,
-    onPlus: () -> Unit,
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        StepIconButton(symbol = "−", onClick = onMinus)
-        Text(
-            text = label,
-            color = BedtimeTokens.muted,
-            style = MaterialTheme.typography.labelMedium,
-            fontWeight = FontWeight.Medium,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.width(16.dp),
-        )
-        StepIconButton(symbol = "+", onClick = onPlus)
-    }
-}
-
-@Composable
-private fun StepIconButton(
-    symbol: String,
-    onClick: () -> Unit,
-) {
-    Surface(
-        onClick = onClick,
-        color = BedtimeTokens.cardHigh,
-        shape = CircleShape,
-        border = BorderStroke(1.dp, BedtimeTokens.border),
-        modifier = Modifier.size(34.dp),
-    ) {
-        Box(contentAlignment = Alignment.Center) {
-            Text(
-                text = symbol,
-                color = BedtimeTokens.primary,
-                fontSize = 22.sp,
-                lineHeight = 22.sp,
-                fontWeight = FontWeight.Medium,
-                textAlign = TextAlign.Center,
-            )
         }
     }
 }
