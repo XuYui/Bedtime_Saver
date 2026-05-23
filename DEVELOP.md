@@ -52,7 +52,7 @@ app/src/main/java/com/bedtimesaver/
 ├── service/
 │   ├── AccessibilityPermission.kt          # 无障碍权限检测
 │   ├── BedtimeAccessibilityService.kt      # 前台应用检测与阻断触发
-│   ├── BedtimeAlarmReceiver.kt             # 到点自动进入监督
+│   ├── BedtimeAlarmReceiver.kt             # 兼容取消旧版自动监督闹钟，不再开启监督
 │   ├── BootReceiver.kt                     # 开机后重新调度
 │   ├── SleepModeStore.kt                   # 睡眠监督状态
 │   └── WakeAlarmReceiver.kt                # 晨起闹钟触发
@@ -69,7 +69,7 @@ app/src/main/java/com/bedtimesaver/
 
 ```text
 design/stitch_bedtime_saver_sleep_assistant/ # Stitch 设计稿和截图
-release/BedtimeSaver-v1.2.0.apk              # 当前发行展示包
+release/BedtimeSaver-v1.2.1.apk              # 当前发行展示包
 release/README.md                            # 当前发行包 SHA-256
 CHANGELOG.md                                 # 每次修改必须更新
 ```
@@ -153,6 +153,7 @@ Get-ChildItem release
 - `SleepRepository.checkInBed()` 负责睡前打卡、达标判断、连续天数计算、开启监督。
 - `SleepRepository.checkInBed()` 会同步调度 `WakeAlarmReceiver`，确保点击「我要睡了」后有晨起闹钟。
 - `SleepRepository.checkInWakeUp()` 负责晨起打卡、睡眠时长计算、关闭监督，并取消晨起闹钟。
+- 目标入睡时间只用于达标判断，不能调度或触发自动监督。
 - `SleepRepository.deleteRecord()` 负责删除误触记录，并重新计算连续天数。
 - `SleepRepository.supplementRecord()` 负责补充打卡，手动写入睡眠日、入睡时间、起床时间，并重算连续天数。
 - 删除当前监督周期记录时，要退出监督状态，避免记录不存在但仍锁定。
@@ -166,7 +167,7 @@ Get-ChildItem release
 ```mermaid
 stateDiagram-v2
     [*] --> Idle
-    Idle --> Guarding: 我要睡了 / 每日目标时间触发
+    Idle --> Guarding: 我要睡了
     Guarding --> Blocking: 打开非白名单应用
     Blocking --> Guarding: 回到桌面
     Blocking --> TempUnlock: 完成 60 秒挑战
@@ -180,8 +181,9 @@ stateDiagram-v2
 - Android 不允许 App 自动开启无障碍服务，必须用户手动开启。
 - 本项目不是系统级锁屏 App，不能承诺真正熄屏或系统锁屏。
 - `AccessibilityService` 只读取前台包名，不读取页面内容。
-- 白名单在 `SleepModeStore`，调整时要避免用户无法返回桌面、设置或拨号。
+- 白名单在 `SleepModeStore`，自身 App 包名必须始终放行，确保用户能回到 App 点击「我起床了」。
 - 晨起闹钟使用 `AlarmManager.setAlarmClock()` 调度，响铃入口是 `AlarmRingActivity`；关闭按钮必须停止铃声/震动并调用 `checkInWakeUp()`。
+- `BedtimeAlarmReceiver` 仅用于取消旧版可能遗留的自动监督闹钟，禁止在其中调用 `SleepModeStore.activate()`。
 
 ## 9. 版本号规范
 

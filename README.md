@@ -12,7 +12,7 @@
 
 ## 项目亮点
 
-- **睡眠监督模式**：用户点击“我要睡了”或到达目标入睡时间后，App 进入监督状态。
+- **睡眠监督模式**：用户点击“我要睡了”后，App 才进入监督状态；目标入睡时间只用于早睡达标判定。
 - **晨起闹钟闭环**：睡前打卡后自动调度晨起闹钟，响铃页支持铃声、震动和关闭后自动晨起打卡。
 - **无障碍应用拦截**：通过 `AccessibilityService` 监听前台窗口变化，监督状态下打开非白名单应用会立即弹出全屏阻断页。
 - **60 秒清醒挑战**：用户坚持要解锁时，需要完成 60 秒倒计时，完成后仅获得 5 分钟临时解锁。
@@ -49,7 +49,7 @@ flowchart TD
     Room["Room DB\nDailySleepRecord"]
     Settings["BedtimeSettings\n目标入睡时间 / 晨起闹钟"]
     Store["SleepModeStore\n监督状态"]
-    Alarm["AlarmManager\n每日目标时间 / 晨起闹钟"]
+    Alarm["AlarmManager\n晨起闹钟"]
     Wake["WakeAlarmReceiver\n晨起响铃触发"]
     A11y["AccessibilityService\n前台应用检测"]
 
@@ -61,7 +61,6 @@ flowchart TD
     Repo --> Alarm
     Alarm --> Wake
     Wake --> UI
-    Alarm --> Store
     A11y --> Store
     A11y --> UI
 ```
@@ -80,7 +79,7 @@ flowchart TD
 
 已生成独立发行目录：
 
-- 发行安装包：`release/BedtimeSaver-v1.2.0.apk`
+- 发行安装包：`release/BedtimeSaver-v1.2.1.apk`
 - 校验信息：`release/README.md`
 
 `portfolio` 使用 debug keystore 签名，适合本机安装、演示和作品集展示；正式发布请使用自己的 release keystore 重新签名。

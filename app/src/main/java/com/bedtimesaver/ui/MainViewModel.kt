@@ -60,8 +60,8 @@ class MainViewModel(
         accessibilityEnabled.value = AccessibilityPermission.isEnabled(appContext)
     }
 
-    fun scheduleNextGuard() {
-        repository.scheduleNextGuard()
+    fun syncScheduledAlarms() {
+        repository.syncScheduledAlarms()
     }
 
     fun checkInBed() {

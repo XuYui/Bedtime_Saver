@@ -31,7 +31,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        viewModel.scheduleNextGuard()
+        viewModel.syncScheduledAlarms()
 
         setContent {
             BedtimeSaverTheme {

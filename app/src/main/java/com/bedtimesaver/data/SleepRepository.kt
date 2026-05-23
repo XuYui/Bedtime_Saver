@@ -41,7 +41,7 @@ class SleepRepository(
         dao.upsert(updated)
         SleepModeStore.activate(context, activeDate = date, startedAtMillis = nowMillis)
         WakeAlarmReceiver.scheduleNextWake(context, settings.getWakeAlarmTime())
-        BedtimeAlarmReceiver.scheduleNext(context, target)
+        BedtimeAlarmReceiver.cancel(context)
     }
 
     suspend fun checkInWakeUp(nowMillis: Long = System.currentTimeMillis()) {
@@ -59,7 +59,7 @@ class SleepRepository(
         dao.upsert(record)
         SleepModeStore.deactivate(context)
         WakeAlarmReceiver.cancel(context)
-        BedtimeAlarmReceiver.scheduleNext(context, settings.getTargetBedtime())
+        BedtimeAlarmReceiver.cancel(context)
     }
 
     suspend fun deleteRecord(date: String) {
@@ -107,7 +107,7 @@ class SleepRepository(
 
     fun updateTargetBedtime(targetBedtime: TargetBedtime) {
         settings.setTargetBedtime(targetBedtime)
-        BedtimeAlarmReceiver.scheduleNext(context, targetBedtime)
+        BedtimeAlarmReceiver.cancel(context)
     }
 
     fun updateWakeAlarmTime(wakeAlarmTime: TargetBedtime) {
@@ -117,8 +117,8 @@ class SleepRepository(
         }
     }
 
-    fun scheduleNextGuard() {
-        BedtimeAlarmReceiver.scheduleNext(context, settings.getTargetBedtime())
+    fun syncScheduledAlarms() {
+        BedtimeAlarmReceiver.cancel(context)
         if (SleepModeStore.getState(context).isActive) {
             WakeAlarmReceiver.scheduleNextWake(context, settings.getWakeAlarmTime())
         }
