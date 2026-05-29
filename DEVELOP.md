@@ -9,7 +9,7 @@
 Bedtime Saver 是一个 Android 防沉迷与早睡习惯养成 App。核心体验是：
 
 - 用户设定目标入睡时间。
-- 睡前点击「我要睡了」进入睡眠监督状态。
+- 睡前点击「我要睡了」或到达目标入睡时间后进入睡眠监督状态，并退回桌面。
 - 监督状态下打开分心应用会被全屏阻断页拦截。
 - 强行解锁需要完成 60 秒清醒挑战。
 - 监督状态下系统闹钟/时钟应用必须被放行，避免影响闹钟响起和关闭。
@@ -51,7 +51,7 @@ app/src/main/java/com/bedtimesaver/
 ├── service/
 │   ├── AccessibilityPermission.kt          # 无障碍权限检测
 │   ├── BedtimeAccessibilityService.kt      # 前台应用检测与阻断触发
-│   ├── BedtimeAlarmReceiver.kt             # 兼容取消旧版自动监督闹钟，不再开启监督
+│   ├── BedtimeAlarmReceiver.kt             # 目标入睡时间自动进入监督
 │   ├── BootReceiver.kt                     # 开机后重新调度
 │   └── SleepModeStore.kt                   # 睡眠监督状态与白名单
 └── ui/
@@ -149,7 +149,7 @@ Get-ChildItem release
 
 - `SleepRepository.checkInBed()` 负责睡前打卡、达标判断、连续天数计算、开启监督。
 - `SleepRepository.checkInWakeUp()` 负责晨起打卡、睡眠时长计算、关闭监督。
-- 目标入睡时间只用于达标判断，不能调度或触发自动监督。
+- 目标入睡时间用于达标判断，并通过 `BedtimeAlarmReceiver` 调度自动进入监督状态。
 - `SleepRepository.deleteRecord()` 负责删除误触记录，并重新计算连续天数。
 - `SleepRepository.supplementRecord()` 负责补充打卡，手动写入睡眠日、入睡时间、起床时间，并重算连续天数。
 - 删除当前监督周期记录时，要退出监督状态，避免记录不存在但仍锁定。
@@ -163,7 +163,7 @@ Get-ChildItem release
 ```mermaid
 stateDiagram-v2
     [*] --> Idle
-    Idle --> Guarding: 我要睡了
+    Idle --> Guarding: 我要睡了 / 到达目标入睡时间
     Guarding --> Blocking: 打开非白名单应用
     Blocking --> Guarding: 回到桌面
     Blocking --> TempUnlock: 完成 60 秒挑战
@@ -179,7 +179,7 @@ stateDiagram-v2
 - `AccessibilityService` 只读取前台包名，不读取页面内容。
 - 白名单在 `SleepModeStore`，自身 App 包名必须始终放行，确保用户能回到 App 点击「我起床了」。
 - 常见系统时钟/闹钟应用必须放行，确保监督状态不影响系统闹钟响起和关闭。
-- `BedtimeAlarmReceiver` 仅用于取消旧版可能遗留的自动监督闹钟，禁止在其中调用 `SleepModeStore.activate()`。
+- `BedtimeAlarmReceiver` 负责目标入睡时间到点后开启监督，并在未监督时调度下一次目标入睡时间。
 
 ## 9. 版本号规范
 

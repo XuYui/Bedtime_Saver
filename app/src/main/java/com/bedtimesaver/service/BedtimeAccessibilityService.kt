@@ -1,6 +1,7 @@
 package com.bedtimesaver.service
 
 import android.accessibilityservice.AccessibilityService
+import android.content.SharedPreferences
 import android.content.Intent
 import android.view.accessibility.AccessibilityEvent
 import com.bedtimesaver.ui.BlockActivity
@@ -8,6 +9,22 @@ import com.bedtimesaver.ui.BlockActivity
 class BedtimeAccessibilityService : AccessibilityService() {
     private var lastBlockedPackage: String? = null
     private var lastBlockedAtMillis: Long = 0L
+    private var lastStateActive = false
+    private val stateListener = SharedPreferences.OnSharedPreferenceChangeListener { _, _ ->
+        val isActive = SleepModeStore.getState(this).isActive
+        if (isActive && !lastStateActive) {
+            goHome()
+        }
+        lastStateActive = isActive
+    }
+
+    override fun onServiceConnected() {
+        SleepModeStore.registerStateListener(this, stateListener)
+        lastStateActive = SleepModeStore.getState(this).isActive
+        if (lastStateActive) {
+            goHome()
+        }
+    }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         if (event == null) return
@@ -33,7 +50,16 @@ class BedtimeAccessibilityService : AccessibilityService() {
         startActivity(intent)
     }
 
+    override fun onDestroy() {
+        SleepModeStore.unregisterStateListener(this, stateListener)
+        super.onDestroy()
+    }
+
     override fun onInterrupt() = Unit
+
+    private fun goHome() {
+        performGlobalAction(GLOBAL_ACTION_HOME)
+    }
 
     private fun isDuplicateBlock(packageName: String, nowMillis: Long): Boolean {
         return lastBlockedPackage == packageName &&

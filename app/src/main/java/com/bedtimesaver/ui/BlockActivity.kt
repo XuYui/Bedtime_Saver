@@ -44,6 +44,8 @@ import com.bedtimesaver.ui.theme.BedtimeSaverTheme
 import kotlinx.coroutines.delay
 
 class BlockActivity : ComponentActivity() {
+    private var leavingForTemporaryUnlock = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -66,10 +68,18 @@ class BlockActivity : ComponentActivity() {
                             context = this,
                             durationMillis = TEMPORARY_UNLOCK_MILLIS,
                         )
+                        leavingForTemporaryUnlock = true
                         finish()
                     },
                 )
             }
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (!leavingForTemporaryUnlock && SleepModeStore.getState(this).isActive) {
+            goHome()
         }
     }
 

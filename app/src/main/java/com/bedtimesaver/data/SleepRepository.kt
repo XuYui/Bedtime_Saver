@@ -41,6 +41,12 @@ class SleepRepository(
         BedtimeAlarmReceiver.cancel(context)
     }
 
+    suspend fun startAutomaticBedtime(nowMillis: Long = System.currentTimeMillis()): Boolean {
+        if (SleepModeStore.getState(context).isActive) return false
+        checkInBed(nowMillis)
+        return true
+    }
+
     suspend fun checkInWakeUp(nowMillis: Long = System.currentTimeMillis()) {
         val activeDate = SleepModeStore.getState(context).activeDate
             ?: SleepDatePolicy.sleepDateStringFor(nowMillis)
@@ -55,13 +61,14 @@ class SleepRepository(
 
         dao.upsert(record)
         SleepModeStore.deactivate(context)
-        BedtimeAlarmReceiver.cancel(context)
+        syncScheduledAlarms()
     }
 
     suspend fun deleteRecord(date: String) {
         dao.deleteByDate(date)
         if (SleepModeStore.getState(context).activeDate == date) {
             SleepModeStore.deactivate(context)
+            syncScheduledAlarms()
         }
         rebuildStreaks()
     }
@@ -102,11 +109,19 @@ class SleepRepository(
 
     fun updateTargetBedtime(targetBedtime: TargetBedtime) {
         settings.setTargetBedtime(targetBedtime)
-        BedtimeAlarmReceiver.cancel(context)
+        syncScheduledAlarms(targetBedtime)
     }
 
     fun syncScheduledAlarms() {
-        BedtimeAlarmReceiver.cancel(context)
+        syncScheduledAlarms(settings.getTargetBedtime())
+    }
+
+    private fun syncScheduledAlarms(targetBedtime: TargetBedtime) {
+        if (SleepModeStore.getState(context).isActive) {
+            BedtimeAlarmReceiver.cancel(context)
+        } else {
+            BedtimeAlarmReceiver.schedule(context, targetBedtime)
+        }
     }
 
     private suspend fun computeStreak(date: String, metGoal: Boolean): Int {

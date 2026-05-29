@@ -47,9 +47,18 @@ object SleepModeStore {
         "com.miui.clock",
         "com.huawei.deskclock",
         "com.coloros.alarmclock",
+        "com.coloros.deskclock",
         "com.oppo.alarmclock",
         "com.vivo.alarmclock",
         "com.oneplus.deskclock",
+        "com.realme.alarmclock",
+        "com.htc.android.worldclock",
+        "com.asus.deskclock",
+        "com.sonyericsson.organizer",
+        "com.lge.clock",
+        "com.lenovo.deskclock",
+        "com.android.alarmclock",
+        "com.transsion.deskclock",
         "com.motorola.timeweatherwidget",
     )
 
@@ -86,7 +95,7 @@ object SleepModeStore {
             .putString(KEY_ACTIVE_DATE, activeDate)
             .putLong(KEY_STARTED_AT, startedAtMillis)
             .putLong(KEY_UNLOCK_UNTIL, 0L)
-            .apply()
+            .commit()
     }
 
     fun deactivate(context: Context) {
@@ -95,7 +104,7 @@ object SleepModeStore {
             .remove(KEY_ACTIVE_DATE)
             .remove(KEY_STARTED_AT)
             .putLong(KEY_UNLOCK_UNTIL, 0L)
-            .apply()
+            .commit()
     }
 
     fun allowTemporaryUnlock(
@@ -105,7 +114,7 @@ object SleepModeStore {
     ) {
         prefs(context).edit()
             .putLong(KEY_UNLOCK_UNTIL, nowMillis + durationMillis)
-            .apply()
+            .commit()
     }
 
     fun shouldBlockPackage(
@@ -117,6 +126,20 @@ object SleepModeStore {
         if (!state.isActive || state.isTemporarilyUnlocked(nowMillis)) return false
         if (packageName == context.packageName) return false
         return packageName !in alwaysAllowedPackages
+    }
+
+    fun registerStateListener(
+        context: Context,
+        listener: SharedPreferences.OnSharedPreferenceChangeListener,
+    ) {
+        prefs(context).registerOnSharedPreferenceChangeListener(listener)
+    }
+
+    fun unregisterStateListener(
+        context: Context,
+        listener: SharedPreferences.OnSharedPreferenceChangeListener,
+    ) {
+        prefs(context).unregisterOnSharedPreferenceChangeListener(listener)
     }
 
     private fun prefs(context: Context): SharedPreferences {
