@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import com.bedtimesaver.MainActivity
 import com.bedtimesaver.data.BedtimeDatabase
 import com.bedtimesaver.data.BedtimeSettings
@@ -56,10 +57,29 @@ class BedtimeAlarmReceiver : BroadcastReceiver() {
             cancel(context)
             val alarmManager = context.getSystemService(AlarmManager::class.java)
             val triggerAtMillis = SleepDatePolicy.nextTriggerMillis(targetBedtime, nowMillis)
-            alarmManager.setAlarmClock(
-                AlarmManager.AlarmClockInfo(triggerAtMillis, showIntent(context)),
-                createTriggerIntent(context, triggerAtMillis),
-            )
+            val pendingIntent = createTriggerIntent(context, triggerAtMillis)
+            runCatching {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S ||
+                    alarmManager.canScheduleExactAlarms()
+                ) {
+                    alarmManager.setAlarmClock(
+                        AlarmManager.AlarmClockInfo(triggerAtMillis, showIntent(context)),
+                        pendingIntent,
+                    )
+                } else {
+                    alarmManager.setAndAllowWhileIdle(
+                        AlarmManager.RTC_WAKEUP,
+                        triggerAtMillis,
+                        pendingIntent,
+                    )
+                }
+            }.recoverCatching {
+                alarmManager.set(
+                    AlarmManager.RTC_WAKEUP,
+                    triggerAtMillis,
+                    pendingIntent,
+                )
+            }
         }
 
         fun cancel(context: Context) {

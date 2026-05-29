@@ -74,7 +74,7 @@ flowchart TD
 
 已生成独立发行目录：
 
-- 发行安装包：`release/BedtimeSaver-v1.2.3.apk`
+- 发行安装包：`release/BedtimeSaver-v1.2.4.apk`
 - 校验信息：`release/README.md`
 
 `portfolio` 使用 debug keystore 签名，适合本机安装、演示和作品集展示；正式发布请使用自己的 release keystore 重新签名。

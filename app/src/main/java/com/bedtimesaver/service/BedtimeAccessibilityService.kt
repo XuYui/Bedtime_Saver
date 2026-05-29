@@ -21,9 +21,6 @@ class BedtimeAccessibilityService : AccessibilityService() {
     override fun onServiceConnected() {
         SleepModeStore.registerStateListener(this, stateListener)
         lastStateActive = SleepModeStore.getState(this).isActive
-        if (lastStateActive) {
-            goHome()
-        }
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
